@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on ASR PUB | 语音酒馆</title>
+    <link>http://asr.pub/posts/</link>
+    <description>Recent content in Posts on ASR PUB | 语音酒馆</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 11 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://asr.pub/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>语音识别之特征提取</title>
+      <link>http://asr.pub/posts/feature_extraction/</link>
+      <pubDate>Thu, 11 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://asr.pub/posts/feature_extraction/</guid>
+      <description>本文主要讲述如何根据音频信号提取 MFCC 和 FBank 特征，这也是目前在语音识别任务中使用最广泛的两种特征。
+人类的语音信号的频率大部分在 10000Hz 以下，根据奈奎斯特采样定理，20000Hz 的采样率就足够了。电话传输的带宽只有 4000Hz，因此电话信号的采样率为 8000Hz，如 Switchboard 语料。我们通常使用麦克风进行音频录制的采样率为 16000Hz，一个采样点使用 16bit 来存储。
+下图是特征提取的整个过程，我们现在就按照这流程来讲述一遍。
+预加重 在音频录制过程中，高频信号更容易衰减，而像元音等一些因素的发音包含了较多的高频信号的成分，高频信号的丢失，可能会导致音素的共振峰并不明显，使得声学模型对这些音素的建模能力不强。预加重是个一阶高通滤波器，可以提高信号高频部分的能量，给定时域输入信号 $x[n]$，预加重之后信号为： $$ y[n]=x[n]-\alpha x[n-1],\qquad \text{$0.9 \leq \alpha \leq 1.0$} $$
+如下图所示，元音音素 /aa/ 原始的频谱图（左）和经过预加重之后的频谱图（右）。
+分帧加窗 分帧 语音信号是一个非稳态的、时变的信号。但在 短时间 范围内可以认为语音信号是稳态的、时不变的。这个短时间一般取 10-30ms，因此在进行语音信号处理时，为减少语音信号整体的非稳态、时变的影响，从而对语音信号进行分段处理，其中每一段称为一帧，帧长一般取 25ms。为了使帧与帧之间平滑过渡，保持其连续性，分帧一般采用交叠分段的方法，保证相邻两帧相互重叠一部分。相邻两帧的起始位置的时间差称为帧移，我们一般在使用中帧移取值为 10ms。
+对于一个 16000Hz 采样的音频来说，帧长有 16000 * 0.025 = 400 个点，帧移有 16000 * 0.01 = 160 个点。使用 num_samples、frame_len、frame_shift 分别代表 音频的数据点数、帧长和帧移，那么 i 帧的数据需要的点数为$(i-1)*frame_shift + frame_len$ ，所以一个有 n 个点的音频，总共能得到 $np.floor((n - frame_len) / frame_shift) + 1$ 帧数据。</description>
+    </item>
+    
+  </channel>
+</rss>
