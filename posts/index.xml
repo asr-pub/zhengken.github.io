@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on ASR PUB | 语音酒馆</title>
-    <link>http://asr.pub/posts/</link>
+    <link>https://asr.pub/posts/</link>
     <description>Recent content in Posts on ASR PUB | 语音酒馆</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 11 Jun 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://asr.pub/posts/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://asr.pub/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>语音识别之特征提取</title>
-      <link>http://asr.pub/posts/feature_extraction/</link>
+      <link>https://asr.pub/posts/feature_extraction/</link>
       <pubDate>Thu, 11 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://asr.pub/posts/feature_extraction/</guid>
+      <guid>https://asr.pub/posts/feature_extraction/</guid>
       <description>本文主要讲述如何根据音频信号提取 MFCC 和 FBank 特征，这也是目前在语音识别任务中使用最广泛的两种特征。
 人类的语音信号的频率大部分在 10000Hz 以下，根据奈奎斯特采样定理，20000Hz 的采样率就足够了。电话传输的带宽只有 4000Hz，因此电话信号的采样率为 8000Hz，如 Switchboard 语料。我们通常使用麦克风进行音频录制的采样率为 16000Hz，一个采样点使用 16bit 来存储。
 下图是特征提取的整个过程，我们现在就按照这流程来讲述一遍。
