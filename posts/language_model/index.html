@@ -21,7 +21,7 @@
       "articleSection" : "posts",
       "name" : "n-gram 语言模型",
       "headline" : "n-gram 语言模型",
-      "description" : "统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) \u0026gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。\n如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \\begin{split} p(s) \u0026amp;= p(w_1, w_2, w_3, \u0026hellip;, w_n) \\\n\u0026amp;= p(w_1^n) \\\n\u0026amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)\u0026hellip;p(w^n|w_1^{n-1}) \\\n\u0026amp;= \\prod_{k=1}^n p(w^k|w_1^{k-1}) \\\n\\end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)\u0026hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\\ |\\ my\\ personal\\ website\\ is\\ asr\\ dot) = \\frac {c(my\\ personal\\ website\\ is\\ asr\\ dot\\ pub)}{c(my\\ personal\\ website\\ is\\ asr\\ dot)} $$",
+      "description" : "语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) \u0026gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。\n如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \\begin{split} p(s) \u0026amp;= p(w_1, w_2, w_3, \u0026hellip;, w_n) \\\n\u0026amp;= p(w_1^n) \\\n\u0026amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)\u0026hellip;p(w^n|w_1^{n-1}) \\\n\u0026amp;= \\prod_{k=1}^n p(w^k|w_1^{k-1}) \\\n\\end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)\u0026hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\\ |\\ my\\ personal\\ website\\ is\\ asr\\ dot) = \\frac {c(my\\ personal\\ website\\ is\\ asr\\ dot\\ pub)}{c(my\\ personal\\ website\\ is\\ asr\\ dot)} $$",
       "inLanguage" : "en-US",
       "author" : "",
       "creator" : "",
@@ -75,13 +75,13 @@ code.has-jax {
 <title>n-gram 语言模型 - ASR PUB | 语音酒馆</title>
   <meta property="og:title" content="n-gram 语言模型 - ASR PUB | 语音酒馆" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
+  <meta property="og:description" content="语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
 如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \begin{split} p(s) &amp;= p(w_1, w_2, w_3, &hellip;, w_n) \
 &amp;= p(w_1^n) \
 &amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1}) \
 &amp;= \prod_{k=1}^n p(w^k|w_1^{k-1}) \
 \end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\ |\ my\ personal\ website\ is\ asr\ dot) = \frac {c(my\ personal\ website\ is\ asr\ dot\ pub)}{c(my\ personal\ website\ is\ asr\ dot)} $$" />
-  <meta name="description" content="统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
+  <meta name="description" content="语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
 如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \begin{split} p(s) &amp;= p(w_1, w_2, w_3, &hellip;, w_n) \
 &amp;= p(w_1^n) \
 &amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1}) \
@@ -145,8 +145,7 @@ code.has-jax {
 
         <div class="post-content markdown-body">
           
-          <h3 id="统计语言模型">统计语言模型</h3>
-<p>语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，<strong>在语音识别的过程中，语言模型用来给定词序列的概率</strong>。例如在某次识别中，声学模型模型输出的音节序列为 <code>yu yan mo xing</code>，那么对应的词序列可以为 <code>语言模型</code> 也可以是 <code>语言魔性</code>，这个时候我们就期望通过语言模型来判定 <code>p(语言模型) &gt; p(语言魔性)</code>，从而输出 <code>语言模型</code>。 下面我们来看一下这个概率是如何计算的。</p>
+          <p>语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，<strong>在语音识别的过程中，语言模型用来给定词序列的概率</strong>。例如在某次识别中，声学模型模型输出的音节序列为 <code>yu yan mo xing</code>，那么对应的词序列可以为 <code>语言模型</code> 也可以是 <code>语言魔性</code>，这个时候我们就期望通过语言模型来判定 <code>p(语言模型) &gt; p(语言魔性)</code>，从而输出 <code>语言模型</code>。 下面我们来看一下这个概率是如何计算的。</p>
 <p>如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为：
 $$
 \begin{split}
@@ -181,7 +180,7 @@ $$
 <p>正如我们上面所说的，由于训练语料的稀疏性，有些词序列找不到怎么办？使用平滑的方法来解决，核心思想是 <strong>将看见的事件概率量的一部分分配给未看见的事件</strong>，用老话讲就是劫富济贫了。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_image-20210529220952517.png" alt="image-20210529220952517"></p>
 <h4 id="拉普拉斯平滑">拉普拉斯平滑</h4>
-<p>拉普拉斯平滑（Laplace Smoothing）也称为 Add-one Smoothing，其核心思想是 **将每个计数加一，从而使得任何词序列都有计数。**以 bigram 为例，常规操作是 $P_{MLE}(w_i|w_{i-1}) = \frac {c(w_{i-1}w_i)}{c(w_i)}$，拉普拉斯平滑为 $P_{laplace}(w_i|w_{i-1}) = \frac {c(w_{i-1}w_i) + 1}{c(w_i)+V}$，$V$ 是词表中词的个数。为了简单的举个例子，假设我们的训练语料有且只有一条文本：</p>
+<p>拉普拉斯平滑（Laplace Smoothing）也称为 Add-one Smoothing，其核心思想是 <strong>将每个计数加一，从而使得任何词序列都有计数</strong>。以 bigram 为例，常规操作是 $P_{MLE}(w_i|w_{i-1}) = \frac {c(w_{i-1}w_i)}{c(w_i)}$，拉普拉斯平滑为 $P_{laplace}(w_i|w_{i-1}) = \frac {c(w_{i-1}w_i) + 1}{c(w_i)+V}$，$V$ 是词表中词的个数。为了简单的举个例子，假设我们的训练语料有且只有一条文本：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># 词表大小为 7</span>
 my personal website is asr dot pub
 </code></pre></div><p>那么 $P_{MLE}(personal\ |\ my) = \frac {1}{1} = 1$，$P_{laplace}(personal\ |\ my) =  \frac {1+1}{1+7} = \frac {2}{8}$，通过拉普拉斯平滑，原本不存在的词序列也会得到一个概率了，比如 $P_{laplace}(website\ |\ my) =  \frac {0+1}{1+7} = \frac {1}{8}$。从这个例子中，我们可以看到，拉普拉斯平滑会将原本一个比较大的概率，削减成一个比较小的值，所以拉普拉斯一般不用在平滑算法中。</p>
@@ -193,7 +192,7 @@ P_{laplace}(w_i) &amp;= \frac{C_i + 1}{N+V} \<br>
 &amp;= \frac{\frac{(C_i + 1)*N}{N+V}}{N} \<br>
 \end{split}
 $$
-如上所示，$w_i$ 的计数由 $c_i$ 变成了 $\frac {(c_i + 1)*N}{N+V}$，所以调整计数为 $c^* = \frac {(c_i + 1)*N}{N+V}$，打折率 $d_c = \frac{c^*}{c_i}$，从公式可以看出打折率的意义是 **调整计数与原计数的比率**。</p>
+如上所示，$w_i$ 的计数由 $c_i$ 变成了 $\frac {(c_i + 1)*N}{N+V}$，所以调整计数为 $c^* = \frac {(c_i + 1)*N}{N+V}$，打折率 $d_c = \frac{c^*}{c_i}$，从公式可以看出打折率的意义是调整计数与原计数的比率 。</p>
 <h4 id="古德图灵平滑">古德图灵平滑</h4>
 <p>古德图灵平滑（Good-turing Smoothing），思想是 <strong>用你看见过一次的事情(Seen Once)估计你未看见的事件(Unseen Events)，并依次类推</strong>。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_image-20210530160335999.png" alt="image-20210530160335999"></p>
@@ -236,7 +235,7 @@ $$
 $$
 N_{1+}(w_{i-N+1}^{i-1}•) = |{ w_i:C(w_{i-N+1}^{i-1} w_i) &gt; 0 }|
 $$
-$N_{1+}$ 表示出现过一次以上的词序列种类数，**•** 表示任意的词都会被统计到。我们对 WB 平滑算法中的 $\lambda_{i-N+1}^{i-1}$ 赋值如下：
+$N_{1+}$ 表示出现过一次以上的词序列种类数，• 表示任意的词都会被统计到。我们对 WB 平滑算法中的 $\lambda_{i-N+1}^{i-1}$ 赋值如下：
 $$
 1-\lambda_{i-N+1}^{i-1} = \frac {N_{1+}(w_{i-N+1}^{i-1}•)} { N_{1+}(w_{i-N+1}^{i-1}•) + \sum_{w_i} C(w_{i-N+1}^{i}) }
 $$
@@ -245,20 +244,14 @@ $$
 P_{WB}(w_i|w_{i-N+1}^{i-1}) = \frac { C(w_{i-N+1}^{i}) + N_{1+}(w_{i-N+1}^{i-1}•) P_{WB}(w_i|w_{i-N+2}^{i-1})} { N_{1+}(w_{i-N+1}^{i-1}•) + \sum_{w_i} C(w_{i-N+1}^{i}) }
 $$</p>
 <h4 id="卡茨平滑">卡茨平滑</h4>
-<p>卡茨平滑（Katz Smoothing），其思想是 <strong>若 n 阶语言模型概率存在，则直接使用打折后（一般使用 Good-turing 打折算法）的概率，否则将打折省出的遗漏量分配给 n-1 阶的的语言模型概率，依此类推</strong>。
-$$
-P_{katz}(w_i|w_{i-n+1}^{i-1})=
-\begin{cases}
-P^*(w_i|w_{i-n+1}^{i-1}) &amp; \text{$C(w_{i-n+1}^{i})&gt;0$} \<br>
-\alpha(w_{i-n+1}^{i-1})P_{katz}(w_{i-n+2}^{i-1}) &amp; \text {other} \<br>
-\end{cases}
-$$
-$\alpha(w_{i-n+1}^{i-1})$ 被称为归一化因子，也就是训练好的语言模型 <code>arpa</code> 文件中最后一列**回退概率**。
+<p>卡茨平滑（Katz Smoothing），其思想是 <strong>若 n 阶语言模型概率存在，则直接使用打折后（一般使用 Good-turing 打折算法）的概率，否则将打折省出的遗漏量分配给 n-1 阶的的语言模型概率，依此类推</strong>。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_37_image-20210704163754315.png" alt="image-20210704163754315"></p>
+<p>$\alpha(w_{i-n+1}^{i-1})$ 被称为归一化因子，也就是训练好的语言模型 <code>arpa</code> 文件中最后一列回退概率。
 $$
 \alpha(w_{i-n+1}^{i-1}) = \frac {1-\sum_{w_i:c(w_{i-n+1}^{i})&gt;0}P_{GT}^*(w_i|w_{i-n+1}^{i-1})}
 {1-\sum_{w_i:c(w_{i-n+1}^{i})&gt;0}P_{GT}^*(w_i|w_{i-n+2}^{i-1})}
 $$
-$w_i:C(w_{i-n+1}^{i})$  所表达的意义为：**词序列 $w^{i-1}_{i-N+1}$ 是固定的， $w_i$ 是任意的。**</p>
+$w_i:C(w_{i-n+1}^{i})$  所表达的意义为：词序列 $w^{i-1}_{i-N+1}$ 是固定的， $w_i$ 是任意的。</p>
 <p>下面让我们看下 $\alpha(w_{i-n+1}^{i-1})$  是如何推导出来的：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_language_model_1%20%281%29.jpg" alt="language_model_1 (1)"></p>
 <h4 id="克奈瑟-内平滑">克奈瑟-内平滑</h4>
@@ -268,7 +261,7 @@ $w_i:C(w_{i-n+1}^{i})$  所表达的意义为：**词序列 $w^{i-1}_{i-N+1}$ �
 $$
 P_{AbsoluteDiscounting}(w_i|w_{i-1}) = \frac{C(w_{i-1}w_i)-D}{C(w_{i-1})} + \alpha(w_{i-1})P(w_i)
 $$
-$\alpha(w_{i-1})$ 是归一化因子，即打折后概率的遗漏量，$\alpha(w_{i-1}) = \frac{D}{C(w_{i-1})}|C(w_{i-1}w_i)&gt;0|$，$P(w_i)$ 是 unigram 的概率。但是在 Kneser-Ney 中用的不是普通的 unigram 概率，而是一种称为接续（Continuation）概率的 unigram。我们举一个 <a href="http://spark-public.s3.amazonaws.com/nlp/slides/languagemodeling.pdf">Dan Jurafsky</a> 的例子，我们现在训练好了一个 bigram 的语言模型，然后需要对一个句子进行预测其中的词，<code>I can't see without my reading ____</code>，从 unigram 的角度来说，Francisco 的概率要大于 glasses，但是 Francisco 往往在 San 的后面。所以我们定义接续概率：**对于一个词，如果在训练文本中有更多的上下文组合，那么它应该就有更高的概率**，其数学公式定义如下：
+$\alpha(w_{i-1})$ 是归一化因子，即打折后概率的遗漏量，$\alpha(w_{i-1}) = \frac{D}{C(w_{i-1})}|C(w_{i-1}w_i)&gt;0|$，$P(w_i)$ 是 unigram 的概率。但是在 Kneser-Ney 中用的不是普通的 unigram 概率，而是一种称为接续（Continuation）概率的 unigram。我们举一个 <a href="http://spark-public.s3.amazonaws.com/nlp/slides/languagemodeling.pdf">Dan Jurafsky</a> 的例子，我们现在训练好了一个 bigram 的语言模型，然后需要对一个句子进行预测其中的词，<code>I can't see without my reading ____</code>，从 unigram 的角度来说，Francisco 的概率要大于 glasses，但是 Francisco 往往在 San 的后面。所以我们定义接续概率：对于一个词，如果在训练文本中有更多的上下文组合，那么它应该就有更高的概率，其数学公式定义如下：
 $$
 P_{continuation} = \frac {| {w_{i-1}:C(w_{i-1}w_i)} &gt; 0 |} {\sum_{w_i} |w_{i-1}:C(w_{i-1}w_i)&gt;0| }
 $$
