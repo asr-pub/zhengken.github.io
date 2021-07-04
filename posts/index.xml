@@ -6,10 +6,24 @@
     <description>Recent content in Posts on ASR PUB | 语音酒馆</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 11 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 04 Jul 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://asr.pub/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>n-gram 语言模型</title>
+      <link>https://asr.pub/posts/language_model/</link>
+      <pubDate>Sun, 04 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://asr.pub/posts/language_model/</guid>
+      <description>统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &amp;gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
+如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \begin{split} p(s) &amp;amp;= p(w_1, w_2, w_3, &amp;hellip;, w_n) \
+&amp;amp;= p(w_1^n) \
+&amp;amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)&amp;hellip;p(w^n|w_1^{n-1}) \
+&amp;amp;= \prod_{k=1}^n p(w^k|w_1^{k-1}) \
+\end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)&amp;hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\ |\ my\ personal\ website\ is\ asr\ dot) = \frac {c(my\ personal\ website\ is\ asr\ dot\ pub)}{c(my\ personal\ website\ is\ asr\ dot)} $$</description>
+    </item>
     
     <item>
       <title>语音识别之特征提取</title>

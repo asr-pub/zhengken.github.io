@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.73.0" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://asr.pub/posts/language_model/" />
+  <link rel="canonical" href="https://asr.pub/posts/language_model/" /><link rel="alternate" type="application/atom+xml" href="https://asr.pub/index.xml" title="ASR PUB | 语音酒馆">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/asr.pub\/"
+      },
+      "articleSection" : "posts",
+      "name" : "n-gram 语言模型",
+      "headline" : "n-gram 语言模型",
+      "description" : "统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) \u0026gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。\n如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \\begin{split} p(s) \u0026amp;= p(w_1, w_2, w_3, \u0026hellip;, w_n) \\\n\u0026amp;= p(w_1^n) \\\n\u0026amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)\u0026hellip;p(w^n|w_1^{n-1}) \\\n\u0026amp;= \\prod_{k=1}^n p(w^k|w_1^{k-1}) \\\n\\end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)\u0026hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\\ |\\ my\\ personal\\ website\\ is\\ asr\\ dot) = \\frac {c(my\\ personal\\ website\\ is\\ asr\\ dot\\ pub)}{c(my\\ personal\\ website\\ is\\ asr\\ dot)} $$",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2021",
+      "datePublished": "2021-07-04 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2021-07-04 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/asr.pub\/posts\/language_model\/",
+      "keywords" : [  ]
+  }
+</script>
+
+
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+<title>n-gram 语言模型 - ASR PUB | 语音酒馆</title>
+  <meta property="og:title" content="n-gram 语言模型 - ASR PUB | 语音酒馆" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
+如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \begin{split} p(s) &amp;= p(w_1, w_2, w_3, &hellip;, w_n) \
+&amp;= p(w_1^n) \
+&amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1}) \
+&amp;= \prod_{k=1}^n p(w^k|w_1^{k-1}) \
+\end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\ |\ my\ personal\ website\ is\ asr\ dot) = \frac {c(my\ personal\ website\ is\ asr\ dot\ pub)}{c(my\ personal\ website\ is\ asr\ dot)} $$" />
+  <meta name="description" content="统计语言模型 语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，在语音识别的过程中，语言模型用来给定词序列的概率。例如在某次识别中，声学模型模型输出的音节序列为 yu yan mo xing，那么对应的词序列可以为 语言模型 也可以是 语言魔性，这个时候我们就期望通过语言模型来判定 p(语言模型) &gt; p(语言魔性)，从而输出 语言模型。 下面我们来看一下这个概率是如何计算的。
+如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为： $$ \begin{split} p(s) &amp;= p(w_1, w_2, w_3, &hellip;, w_n) \
+&amp;= p(w_1^n) \
+&amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1}) \
+&amp;= \prod_{k=1}^n p(w^k|w_1^{k-1}) \
+\end{split} $$ 那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 my personal website is asr dot pub，那么有： $$ p(pub\ |\ my\ personal\ website\ is\ asr\ dot) = \frac {c(my\ personal\ website\ is\ asr\ dot\ pub)}{c(my\ personal\ website\ is\ asr\ dot)} $$" />
+  <meta property="og:locale" content="en-us" />
+
+  <link rel="stylesheet" href="/css/flexboxgrid-6.3.1.min.css" />
+  <link rel="stylesheet" href="/css/github-markdown.css" />
+  <link rel="stylesheet" href="/css/highlight/tomorrow.min.css" />
+  <link rel="stylesheet" href="/css/index.css">
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="ASR PUB | 语音酒馆">
+  
+  <link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker|Bree+Serif" rel="stylesheet">
+  
+  
+
+  
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="signatures site-title">
+    <a href="/">ASR PUB</a>
+  </div>
+</header>
+<div class="row end-xs">
+  
+  
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">n-gram 语言模型</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2021-07-04 00:00:00 UTC">
+                04 Jul 2021
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h3 id="统计语言模型">统计语言模型</h3>
+<p>语言模型可以说是传统语音识别的三大件（声学模型、语言模型、解码器）之一了，<strong>在语音识别的过程中，语言模型用来给定词序列的概率</strong>。例如在某次识别中，声学模型模型输出的音节序列为 <code>yu yan mo xing</code>，那么对应的词序列可以为 <code>语言模型</code> 也可以是 <code>语言魔性</code>，这个时候我们就期望通过语言模型来判定 <code>p(语言模型) &gt; p(语言魔性)</code>，从而输出 <code>语言模型</code>。 下面我们来看一下这个概率是如何计算的。</p>
+<p>如果我们有一个词序列 $ s = (w_1, … , w_n)$，它的概率可以表示为：
+$$
+\begin{split}
+p(s) &amp;= p(w_1, w_2, w_3, &hellip;, w_n) \<br>
+&amp;= p(w_1^n) \<br>
+&amp;= p(w_1)p(w_2|w_1)p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1}) \<br>
+&amp;= \prod_{k=1}^n p(w^k|w_1^{k-1}) \<br>
+\end{split}
+$$
+那么 $p(w_1), p(w_2|w_1), p(w_3|w_1^2)&hellip;p(w^n|w_1^{n-1})$ 这些概率是怎么来的呢？是从语料里面通过计数算出来的，比如有句话 <code>my personal website is asr dot pub</code>，那么有：
+$$
+p(pub\ |\ my\ personal\ website\ is\ asr\ dot) = \frac {c(my\ personal\ website\ is\ asr\ dot\ pub)}{c(my\ personal\ website\ is\ asr\ dot)}
+$$</p>
+<p><code>c(a b)</code> 表示 <code>a b</code> 序列在语料中出现的次数。 从这个计算公式我们可以看到一个缺点，就是当历史信息过长的时候，可能语料库里面没有完全一致的序列存在，随着历史信息的增加，数据稀疏的问题会比较显著，一个容易想到的做法是使用几个最近的历史词来代替整个历史词序列，这就引出了下一个话题：n-gram 语言模型。</p>
+<h3 id="n-gram-语言模型与评价方法">n-gram 语言模型与评价方法</h3>
+<p>n-gram 是指使用前 n-1 个词来估计当前（第 n 个）词，即 $p(w_i|w_1^{i-1})=p(w_i|w_{i-n+1}^{i-1})$。根据 n-gram 中 n 的值，我们有 unigram（$p(w_i)$）、bigram（$p(w_i|w_{i-1})$）、trigram（$p(w_i|w_{i-2}^{i-1})$） 等等。n-gram 中概率的计算方法也是通过计数来得到的，只不过和上面说的一样，也会有语料中不存在词序列，关于这个问题的解决方法我们在后面的平滑算法中提出来。</p>
+<p>在我们训练好一个语言模型后，我们可以用这个语言模型对测试文本进行测试，在测试文本上面得到的概率值越大越好。<strong>困惑度</strong>（Perplexity）就是衡量语言模型性能的一个算法，假如我们有一个句子 $W=w_1,w_2,w_3,…,w_n$ ，具体计算公式如下所示：
+$$
+\begin{split}
+PP(W) &amp;= P(w_1w_2&hellip;w_n)^{-\frac {1}{n}} \<br>
+&amp;= \sqrt[n]{\frac{1}{p(w_1w_2&hellip;w_n)}} \<br>
+&amp;= \sqrt[n]{\prod_{i=1}^{n} \frac{1}{p(w_i|w_{i-n+1}^{i-1})}}
+\end{split}
+$$
+从公式可以看出，语言模型性能越好，那么困惑度就越低。下面的数值来自 Dan Jurafsky 的教学文档，链接见参考文章：</p>
+<ul>
+<li>WSJ 数据集，训练集有 38 million 词，测试集有 1.5 million 词</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_18_image-20210529222111920.png" alt="image-20210529222111920"></p>
+<p>因为不同的词出现在句首或者句尾的概率是不同的，比如像语气词 <code>吗 啊 嘛</code> 在句尾就经常出现。所以我们在训练语料中每一行文本句首加上 <code>&lt;s&gt;</code> ，句尾加上 <code>&lt;/s&gt;</code>，用来标识一句话开始和结束，这样训练好输出的语言模型就可以知道不同的词出现在句首和句尾的概率了。而且在训练语言模型的时候，我们也不会用到训练语料里面所有的词，我们会提供一个词表，语料里面不在词表中的词会被标记成 <code>&lt;unk&gt;</code>。</p>
+<h3 id="平滑算法">平滑算法</h3>
+<p>正如我们上面所说的，由于训练语料的稀疏性，有些词序列找不到怎么办？使用平滑的方法来解决，核心思想是 <strong>将看见的事件概率量的一部分分配给未看见的事件</strong>，用老话讲就是劫富济贫了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_image-20210529220952517.png" alt="image-20210529220952517"></p>
+<h4 id="拉普拉斯平滑">拉普拉斯平滑</h4>
+<p>拉普拉斯平滑（Laplace Smoothing）也称为 Add-one Smoothing，其核心思想是 **将每个计数加一，从而使得任何词序列都有计数。**以 bigram 为例，常规操作是 $P_{MLE}(w_i|w_{i-1}) = \frac {c(w_{i-1}w_i)}{c(w_i)}$，拉普拉斯平滑为 $P_{laplace}(w_i|w_{i-1}) = \frac {c(w_{i-1}w_i) + 1}{c(w_i)+V}$，$V$ 是词表中词的个数。为了简单的举个例子，假设我们的训练语料有且只有一条文本：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># 词表大小为 7</span>
+my personal website is asr dot pub
+</code></pre></div><p>那么 $P_{MLE}(personal\ |\ my) = \frac {1}{1} = 1$，$P_{laplace}(personal\ |\ my) =  \frac {1+1}{1+7} = \frac {2}{8}$，通过拉普拉斯平滑，原本不存在的词序列也会得到一个概率了，比如 $P_{laplace}(website\ |\ my) =  \frac {0+1}{1+7} = \frac {1}{8}$。从这个例子中，我们可以看到，拉普拉斯平滑会将原本一个比较大的概率，削减成一个比较小的值，所以拉普拉斯一般不用在平滑算法中。</p>
+<p>在这里我们要引入两个比较重要的概念，在后面的平滑算法中会经常碰到，分别是 <strong>调整计数（adjusted count）</strong> 和 <strong>打折率（discount</strong></p>
+<p><strong>ratio）</strong>。以 unigram 为例，我们将 $w_i$ 的计数记为 $c_i$，$P_{MLP}(w_i)=\frac{c_i}{N}$，$P_{laplace}(w_i)=\frac{c_i + 1}{N+V}$。调整计数的意义是描述平滑算法仅对 $P_{MLP}(w_i)$ 中分子的影响，所以我们需要将 $P_{MLP}$ 与 $P_{laplace}$ 中的分母先统一一下：
+$$
+\begin{split}
+P_{laplace}(w_i) &amp;= \frac{C_i + 1}{N+V} \<br>
+&amp;= \frac{\frac{(C_i + 1)*N}{N+V}}{N} \<br>
+\end{split}
+$$
+如上所示，$w_i$ 的计数由 $c_i$ 变成了 $\frac {(c_i + 1)*N}{N+V}$，所以调整计数为 $c^* = \frac {(c_i + 1)*N}{N+V}$，打折率 $d_c = \frac{c^*}{c_i}$，从公式可以看出打折率的意义是 **调整计数与原计数的比率**。</p>
+<h4 id="古德图灵平滑">古德图灵平滑</h4>
+<p>古德图灵平滑（Good-turing Smoothing），思想是 <strong>用你看见过一次的事情(Seen Once)估计你未看见的事件(Unseen Events)，并依次类推</strong>。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_image-20210530160335999.png" alt="image-20210530160335999"></p>
+<p>我们定义 $N_c$ 表示频率 c 出现的频数（Frequency of frequency c），这里借用 <a href="http://spark-public.s3.amazonaws.com/nlp/slides/languagemodeling.pdf">Dan Jurafsky</a> 的例子如下：</p>
+<pre><code># 一条文本
+Sam I am I am Sam I do not eat
+
+# 每个词出现的频率
+I    3
+sam  2
+am   2
+do   1
+not  1
+eat  1
+
+# 各个频率的频数
+N1 = 3
+N2 = 2
+N3 = 1
+</code></pre><p>根据上面讲的，我们得出调整计数 $c^*=\frac{N_{c+1}*(c+1)}{N_c}$。所有词表上在语料中没有出现的词的概率为 $P^*_{GT}(Unseen Events) = \frac{N_1}{N}$，这个值也被称为遗漏量（missing mass），如果我们要求单个未出现词的概率，则为 $P^*_{GT}(Unseen Events) = \frac{N_1}{N*N_0}$，其中 $N_0$ 是所有未出现词的个数。</p>
+<p>该平滑算法不会单独使用，一般与其他平滑算法结合起来使用。</p>
+<h4 id="jelinekmercer-平滑">Jelinek–Mercer 平滑</h4>
+<p>假设我们的语料中，$C(BURNISH\ \ THE) = 0$ 和 $C(BURNISH\ \ THOU) = 0$ ，那么根据拉普拉斯和古德图灵平滑算法，我们有 $P(THE|BURNISH) = P(THOU|BURNISH)$，但是这个结论似乎与我们的直觉相反，因为 THE 出现的频率要远大于 THOU，更符合现实规律的是 $P(THE|BURNISH) &gt; P(THOU|BURNISH)$。</p>
+<p>我们可以将 bigram 和 unigram 的概率进行插值达到我们所需要的结论，插值如下：
+$$
+P_{MLE}(w_i|w_{i-1}) = \lambda P_{MLE}(w_i|w_{i-1}) + (1-\lambda)P_{MLE}(w_i)
+$$
+该方法是由  Jelinek and Mercer (1980) 提出来的，目前使用的一个版本是由 Brown, S. A. Della Pietra, V. J. Della Pietra, Lai and Mercer (1992a) 发表的：
+$$
+P_{interp}(w_i|w_{i-N+1}^{i-1}) = \lambda_{i-N+1}^{i-1}P_{MLE}(w_i|w_{i-N+1}^{i-1}) + (1-\lambda_{i-N+1}^{i-1})P_{interp}(w_i|w_{i-N+2}^{i-1})
+$$
+可以看出来这是一个递归的计算公式，那么要终止这个递归公式有两种方法：</p>
+<ul>
+<li>使用 unigram 的 MLE 概率，或者其他的平滑概率</li>
+<li>使用 zero-gram 的概率，也称为 uniform model，其值为 $P_{w_i}=\frac{1}{|V|}$，$|V|$ 是词表的大小</li>
+</ul>
+<p>计算公式中的 $\lambda$ 可以在 held-out set 上面用 EM 算法迭代出来，一般不会为每个 $w_{i-N+1}^{i-1}$ 计算一个单独的 $\lambda_{i-N+1}^{i-1}$，然而设置一个全局的 $\lambda_{i-N+1}^{i-1}$ 会导致一个比较差的性能。通常的做法是根据 $C(w_{i-N+1}^{i-1})$ 的值，将 $\lambda_{i-N+1}^{i-1}$ 放入不同的 bucket，相同的 bucket 里面的 $\lambda_{i-N+1}^{i-1}$ 的值都是一样的，该方法的论文为 <a href="https://www.cse.iitb.ac.in/~pb/cs626-2013/word-alignment/jelineck-speech-1983.pdf">A Maximum Likelihood Approach to Continuous Speech Recognition</a> 。</p>
+<h4 id="witten-bell-平滑">Witten-Bell 平滑</h4>
+<p>Witten–Bell 平滑开出出来的初衷是用于文本压缩的，可以认为它是 Jelinek–Mercer 平滑的一个特例。它的计算公式和上面的 Jelinek–Mercer 递归插值是一样的，只不过 WB 平滑在计算 $\lambda_{i-N+1}^{i-1}$ 时有它自己的方法。我们需要定义 $w_{i-N+1}^{i-1}$ 后面跟着的词的种类数，用符号 $N_{1+}(w_{i-N+1}^{i-1}·)$ 来表示，其正式的定义为：
+$$
+N_{1+}(w_{i-N+1}^{i-1}•) = |{ w_i:C(w_{i-N+1}^{i-1} w_i) &gt; 0 }|
+$$
+$N_{1+}$ 表示出现过一次以上的词序列种类数，**•** 表示任意的词都会被统计到。我们对 WB 平滑算法中的 $\lambda_{i-N+1}^{i-1}$ 赋值如下：
+$$
+1-\lambda_{i-N+1}^{i-1} = \frac {N_{1+}(w_{i-N+1}^{i-1}•)} { N_{1+}(w_{i-N+1}^{i-1}•) + \sum_{w_i} C(w_{i-N+1}^{i}) }
+$$
+所以我们带入上面 Jelinek–Mercer 递归公式中有：
+$$
+P_{WB}(w_i|w_{i-N+1}^{i-1}) = \frac { C(w_{i-N+1}^{i}) + N_{1+}(w_{i-N+1}^{i-1}•) P_{WB}(w_i|w_{i-N+2}^{i-1})} { N_{1+}(w_{i-N+1}^{i-1}•) + \sum_{w_i} C(w_{i-N+1}^{i}) }
+$$</p>
+<h4 id="卡茨平滑">卡茨平滑</h4>
+<p>卡茨平滑（Katz Smoothing），其思想是 <strong>若 n 阶语言模型概率存在，则直接使用打折后（一般使用 Good-turing 打折算法）的概率，否则将打折省出的遗漏量分配给 n-1 阶的的语言模型概率，依此类推</strong>。
+$$
+P_{katz}(w_i|w_{i-n+1}^{i-1})=
+\begin{cases}
+P^*(w_i|w_{i-n+1}^{i-1}) &amp; \text{$C(w_{i-n+1}^{i})&gt;0$} \<br>
+\alpha(w_{i-n+1}^{i-1})P_{katz}(w_{i-n+2}^{i-1}) &amp; \text {other} \<br>
+\end{cases}
+$$
+$\alpha(w_{i-n+1}^{i-1})$ 被称为归一化因子，也就是训练好的语言模型 <code>arpa</code> 文件中最后一列**回退概率**。
+$$
+\alpha(w_{i-n+1}^{i-1}) = \frac {1-\sum_{w_i:c(w_{i-n+1}^{i})&gt;0}P_{GT}^*(w_i|w_{i-n+1}^{i-1})}
+{1-\sum_{w_i:c(w_{i-n+1}^{i})&gt;0}P_{GT}^*(w_i|w_{i-n+2}^{i-1})}
+$$
+$w_i:C(w_{i-n+1}^{i})$  所表达的意义为：**词序列 $w^{i-1}_{i-N+1}$ 是固定的， $w_i$ 是任意的。**</p>
+<p>下面让我们看下 $\alpha(w_{i-n+1}^{i-1})$  是如何推导出来的：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_language_model_1%20%281%29.jpg" alt="language_model_1 (1)"></p>
+<h4 id="克奈瑟-内平滑">克奈瑟-内平滑</h4>
+<p>Church 和 Gale（1991）对具有 2200 万词的 AP Newswire 语料进行 Good-turing 打折计算后得到如下表格：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/asr-pub/uPic@master/uPic/2021_07_04_16_19_image-20210605145507262.png" alt="image-20210605145507262"></p>
+<p>除了 0 和 1 之外，其他的打折计数近似于原计数减去 <strong>0.75（使用 D 表示）</strong>，这样在计算中就比较快了。在实际应用中，0 和 1 会有专门的处理。<strong>绝对打折</strong>（Absolute Discounting）公式如下所示：
+$$
+P_{AbsoluteDiscounting}(w_i|w_{i-1}) = \frac{C(w_{i-1}w_i)-D}{C(w_{i-1})} + \alpha(w_{i-1})P(w_i)
+$$
+$\alpha(w_{i-1})$ 是归一化因子，即打折后概率的遗漏量，$\alpha(w_{i-1}) = \frac{D}{C(w_{i-1})}|C(w_{i-1}w_i)&gt;0|$，$P(w_i)$ 是 unigram 的概率。但是在 Kneser-Ney 中用的不是普通的 unigram 概率，而是一种称为接续（Continuation）概率的 unigram。我们举一个 <a href="http://spark-public.s3.amazonaws.com/nlp/slides/languagemodeling.pdf">Dan Jurafsky</a> 的例子，我们现在训练好了一个 bigram 的语言模型，然后需要对一个句子进行预测其中的词，<code>I can't see without my reading ____</code>，从 unigram 的角度来说，Francisco 的概率要大于 glasses，但是 Francisco 往往在 San 的后面。所以我们定义接续概率：**对于一个词，如果在训练文本中有更多的上下文组合，那么它应该就有更高的概率**，其数学公式定义如下：
+$$
+P_{continuation} = \frac {| {w_{i-1}:C(w_{i-1}w_i)} &gt; 0 |} {\sum_{w_i} |w_{i-1}:C(w_{i-1}w_i)&gt;0| }
+$$
+所以有 Kneser-Ney 平滑算法的具体公式为：
+$$
+P_{KN}(w_i|w_{i-N+1}^{i-1}) = \frac{max(C(w_{i-N+1}^{i})-D,0)}{C(w_{i-N+1}^{i-1})} + \alpha(w_{i-N+1}^{i-1})P_{KN}(w_i|w_{i-N+2}^{i-1})
+$$</p>
+<h3 id="参考文章">参考文章</h3>
+<p><a href="https://en.wikipedia.org/wiki/N-gram">wiki n-gram</a></p>
+<p><a href="http://spark-public.s3.amazonaws.com/nlp/slides/languagemodeling.pdf">Dan Jurafsky - Language Model</a></p>
+<p><a href="https://www.youtube.com/watch?v=hB2ShMlwTyc">Introduction to N-grams — [ NLP || Dan Jurafsky || Stanford University ]</a></p>
+<p><a href="https://www.youtube.com/watch?v=1vUVNdDkIJI">Lecture 18 — Good Turing Smoothing — [ NLP || Dan Jurafsky || Stanford University ]</a></p>
+<p><a href="https://www.youtube.com/watch?v=ody1ysUTD7o">Kneser-Ney Smoothing</a></p>
+<p><a href="https://ai.googleblog.com/2006/08/all-our-n-gram-are-belong-to-you.html">All Our N-gram are Belong to You</a></p>
+<p><a href="https://u.cs.biu.ac.il/~yogo/courses/mt2013/papers/chen-goodman-99.pdf">An empirical study of smoothing techniques for language modeling</a></p>
+<p><a href="https://www.ee.columbia.edu/~stanchen/e6884/labs/lab3/x207.html">4. Part 3: Implement Witten-Bell smoothing</a></p>
+<p><a href="https://nlp.stanford.edu/~wcmac/papers/20050421-smoothing-tutorial.pdf">Jelinek-Mercer smoothing</a></p>
+<p><a href="https://www.cse.iitb.ac.in/~pb/cs626-2013/word-alignment/jelineck-speech-1983.pdf">A Maximum Likelihood Approach to Continuous Speech Recognition</a></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+
+        
+        
+
+        
+        
+        <div style="height: 50px;"></div>
+        
+        
+
+        <div class="site-footer">
+  
+  <div class="site-footer-item">
+    <a href="https://github.com/asr-pub" target="_blank">Github</a>
+  </div>
+  
+
+  
+
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  <script src="/js/highlight.pack.js"></script>
+
+
+<script>
+  hljs.initHighlightingOnLoad();
+  
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
